@@ -20,6 +20,8 @@ public class Main {
         Server s3 = new Server();
         s3.connectToGroup(groupName);
 
+        s3.leave();
+
         try {
             Thread.sleep(5000);
             GroupConnection.getInstance().getConnection().disconnect();

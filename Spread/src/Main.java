@@ -1,7 +1,4 @@
-import spread.*;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import spread.SpreadException;
 
 /**
  * Created by inafalcao on 9/14/15.
@@ -9,42 +6,29 @@ import java.net.UnknownHostException;
 public class Main {
 
     public static void main(String args[]) {
+
+        String groupName = "group";
+
+        // Adding servers
+
+        Server s1 = new Server();
+        s1.connectToGroup(groupName);
+
+        Server s2 = new Server();
+        s2.connectToGroup(groupName);
+
+        Server s3 = new Server();
+        s3.connectToGroup(groupName);
+
         try {
-
-            // Creating a group
-
-            SpreadGroup group = new SpreadGroup();
-            String groupName = "group";
-            group.join(GroupConnection.getInstance().getConnection(), groupName);
-
-            // Adding servers
-
-            Server s1 = new Server();
-            s1.connectToGroup(groupName);
-
-            Server s2 = new Server();
-            s1.connectToGroup(groupName);
-
-            Server s3 = new Server();
-            s1.connectToGroup(groupName);
-
-
-
-            BasicMessageListener listener = new BasicMessageListener() {
-                @Override
-                public void messageReceived(SpreadMessage message) {
-                    s1.processMessage(message);
-                    s2.processMessage(message);
-                    s3.processMessage(message);
-                }
-            };
-            GroupConnection.getInstance().getConnection().add(listener);
-
+            Thread.sleep(5000);
+            GroupConnection.getInstance().getConnection().disconnect();
         } catch (SpreadException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
     }
-
 
 }

@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * Created by inafalcao on 9/14/15.
  */
-public class Server implements Serializable {
+public class Server implements Serializable, Re {
 
     private String id;
     private int priority;

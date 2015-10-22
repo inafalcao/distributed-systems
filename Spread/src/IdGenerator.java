@@ -3,7 +3,7 @@
  */
 public class IdGenerator {
 
-    private int currentId = 67;
+    private int currentId = 1;
 
     private static IdGenerator instance;
 

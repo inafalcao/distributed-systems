@@ -49,5 +49,6 @@ public class Database implements RemoteFileOperations {
     @Override
     public void createFile(RemoteFile file) {
         this.files.add(file);
+        System.out.println("FILE CREATED");
     }
 }

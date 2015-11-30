@@ -132,11 +132,9 @@ public class Server implements Serializable, RemoteFileOperations {
     }
 
     public void leave() {
-        try {
-            this.spreadGroup.leave();
-        } catch (SpreadException e) {
-            e.printStackTrace();
-        }
+
+        GroupConnection.getInstance().getConnection().remove(listener);
+
     }
 
     public boolean isMaster() {
@@ -149,7 +147,7 @@ public class Server implements Serializable, RemoteFileOperations {
     }
 
     @Override
-    public List<RemoteFile> getFiles() {
+    public RemoteFile viewFile(RemoteFile f) {
         return null;
     }
 
@@ -166,5 +164,9 @@ public class Server implements Serializable, RemoteFileOperations {
     @Override
     public void createFile(RemoteFile file) {
 
+    }
+
+    public void setIsMaster(boolean isMaster) {
+        this.isMaster = isMaster;
     }
 }

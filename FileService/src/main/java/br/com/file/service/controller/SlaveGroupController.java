@@ -6,13 +6,7 @@ import br.com.file.service.model.RemoteFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import javax.validation.Valid;
-import java.util.List;
 
 @Controller
 public class SlaveGroupController {
@@ -35,7 +29,6 @@ public class SlaveGroupController {
     @RequestMapping(value = "/slave/add", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void custom(@RequestBody RemoteFile file) {
-
         try {
             getSlave(file).createFile(file);
         } catch (Exception e) {
@@ -52,7 +45,6 @@ public class SlaveGroupController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return ff;
     }
 

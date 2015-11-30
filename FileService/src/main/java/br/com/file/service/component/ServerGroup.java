@@ -14,7 +14,7 @@ public class ServerGroup {
 
     String groupName = "serverGroup";
 
-    List<Server> servers;
+    private List<Server> servers;
 
     public ServerGroup() {
         // Adding servers
@@ -36,13 +36,6 @@ public class ServerGroup {
 
         servers.get(0).sendElection();
 
-        /*try {
-            //Thread.sleep(5000);
-
-            //GroupConnection.getInstance().getConnection().disconnect();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
     }
 
     public Server getMaster() {
@@ -62,4 +55,11 @@ public class ServerGroup {
         return g;
     }
 
+    public List<Server> getServers() {
+        return servers;
+    }
+
+    public void setServers(List<Server> servers) {
+        this.servers = servers;
+    }
 }

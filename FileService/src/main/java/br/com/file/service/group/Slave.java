@@ -197,7 +197,19 @@ public class Slave implements Serializable, RemoteFileOperations {
 
     @Override
     public void editFile(RemoteFile file) {
-
+        remoteFile = file;
+        changeAvaliability(false);
+        try {
+            Thread.sleep(3000);
+            Database.getInstance().editFile(file);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            changeAvaliability(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            changeAvaliability(true);
+        }
+        changeAvaliability(true);
     }
 
     @Override

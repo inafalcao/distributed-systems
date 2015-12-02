@@ -2,6 +2,7 @@ package br.com.file.service.group;
 
 import br.com.file.service.model.RemoteFile;
 import br.com.file.service.model.RemoteFileOperations;
+import org.apache.commons.collections.ListUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,42 +14,53 @@ public class Database implements RemoteFileOperations {
 
     private List<RemoteFile> files;
 
-    private static Database instance;
-
-    private Database() {
+    public Database() {
         files = new ArrayList<>();
-    }
-
-    public static Database getInstance() {
-        if (instance == null)
-            instance = new Database();
-        return instance;
+        files = ListUtils.synchronizedList(files);
     }
 
     @Override
     public RemoteFile viewFile(RemoteFile file) {
-        return files.get(files.indexOf(file));
-    }
-
-    @Override
-    public void removeFile(Integer id) {
         for (RemoteFile f : files) {
-            if (f.getId() == Long.valueOf(id))
-                files.remove(files.indexOf(f));
+            if (f.getId() == file.getId()) {
+                return f;
+            }
         }
+        return null;
     }
 
     @Override
-    public void editFile(RemoteFile file) {
+    public RemoteFile removeFile(Integer id) {
         for (RemoteFile f : files) {
-            if (f.getId() == file.getId())
+            if (f.getId() == id) {
+                return files.remove(files.indexOf(f));
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public RemoteFile editFile(RemoteFile file) {
+        for (RemoteFile f : files) {
+            if (f.getId() == file.getId()) {
                 files.set(files.indexOf(f), file);
+                return file;
+            }
         }
+        return null;
     }
 
     @Override
-    public void createFile(RemoteFile file) {
+    public RemoteFile createFile(RemoteFile file) {
         this.files.add(file);
-        System.out.println("FILE CREATED");
+        return file;
     }
+
+    public void showFiles() {
+        for (RemoteFile f : files) {
+            System.out.printf("id: " + f.getId() + ", content: " + f.getContent() + " | ");
+        }
+        System.out.println("\n_________________________________________________________________");
+    }
+
 }

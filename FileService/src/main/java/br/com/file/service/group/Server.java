@@ -1,24 +1,25 @@
 package br.com.file.service.group;
 
 
+import br.com.file.service.component.SlaveGroup;
+import br.com.file.service.enumeration.Operation;
 import br.com.file.service.model.RemoteFile;
 import br.com.file.service.model.RemoteFileOperations;
+import br.com.file.service.model.WaitingOperation;
 import spread.AdvancedMessageListener;
 import spread.SpreadException;
 import spread.SpreadGroup;
 import spread.SpreadMessage;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.LinkedBlockingDeque;
 
 
 /**
  * Created by inafalcao on 9/14/15.
  */
-public class Server implements Serializable, RemoteFileOperations {
+public class Server extends Thread implements Serializable {
 
     private int id;
     private boolean isMaster = false;
@@ -28,11 +29,24 @@ public class Server implements Serializable, RemoteFileOperations {
     private SpreadGroup spreadGroup;
     private String groupName;
 
+    private LinkedBlockingDeque<WaitingOperation> waitingOperations;
+
     public Server() {
         id = IdGenerator.getInstance().getId();
         spreadGroup = new SpreadGroup();
         GroupConnection.getInstance().getConnection().add(listener);
         knownServers = new HashMap<>();
+        waitingOperations = new LinkedBlockingDeque<>();
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            if (waitingOperations.size()>0) {
+                WaitingOperation wo = waitingOperations.poll();
+                processOperation(wo.getOperation(), wo.getFile());
+            }
+        }
     }
 
     public void connectToGroup(String group) {
@@ -76,13 +90,10 @@ public class Server implements Serializable, RemoteFileOperations {
     };
 
     public void processMessage (SpreadMessage message) throws SpreadException {
-        //actions[message.getType()].execute(message);
-
         switch (message.getType()) {
             case 0: processElection(message); break;
             default: break;
         }
-
     }
 
     private void processElection(SpreadMessage message) {
@@ -93,7 +104,6 @@ public class Server implements Serializable, RemoteFileOperations {
 
             if (this.id > id) {
                 sendElection();
-
             }
             else {
                 if(this.id != id)
@@ -146,24 +156,52 @@ public class Server implements Serializable, RemoteFileOperations {
         return "id = " + id;
     }
 
-    @Override
-    public RemoteFile viewFile(RemoteFile f) {
-        return null;
+    public void processOperation(Operation op, RemoteFile file) {
+        boolean isPossible = true;
+
+        if(op.equals(Operation.READ)) {
+            Slave avaliableSlave = null;
+            for (Slave s : SlaveGroup.slaves ) {
+                if(!s.isBusy())
+                    avaliableSlave = s;
+            }
+            for (Slave s : SlaveGroup.slaves ) {
+                if(s.isBusy() &&
+                   s.getRemoteFile().getId()==file.getId() &&
+                   !s.getCurrentOperation().equals(Operation.READ)) {
+                    // Coloca na fila
+                    waitingOperations.add(new WaitingOperation(file, op));
+                    isPossible = false;
+                }
+
+            }
+
+            if(avaliableSlave != null && isPossible)
+                avaliableSlave.processOperation(op, file);
+        }
+
+        if(op.equals(Operation.WRITE) || op.equals(Operation.CREATE) || op.equals(Operation.REMOVE)) {
+            Slave avaliableSlave = null;
+            for (Slave s : SlaveGroup.slaves ) {
+                if(!s.isBusy())
+                    avaliableSlave = s;
+            }
+            for (Slave s : SlaveGroup.slaves ) {
+                if(s.isBusy() && s.getRemoteFile().getId()==file.getId()) {
+                    waitingOperations.add(new WaitingOperation(file, op));
+                    isPossible = false;
+                }
+            }
+
+            if(avaliableSlave != null && isPossible) {
+                avaliableSlave.processOperation(op, file);
+            }
+        }
+
     }
 
-    @Override
-    public void removeFile(Integer id) {
-
-    }
-
-    @Override
-    public void editFile(RemoteFile file) {
-
-    }
-
-    @Override
-    public void createFile(RemoteFile file) {
-
+    public void addWaitingOperation(Operation op, RemoteFile file) {
+        this.waitingOperations.add(new WaitingOperation(file, op));
     }
 
     public void setIsMaster(boolean isMaster) {

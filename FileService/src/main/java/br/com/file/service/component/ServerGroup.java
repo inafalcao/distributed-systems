@@ -22,12 +22,15 @@ public class ServerGroup {
         servers = new ArrayList<>();
 
         Server s1 = new Server();
+        s1.start();
         s1.connectToGroup(groupName);
 
         Server s2 = new Server();
+        s2.start();
         s2.connectToGroup(groupName);
 
         Server s3 = new Server();
+        s3.start();
         s3.connectToGroup(groupName);
 
         servers.add(s1);

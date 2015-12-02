@@ -10,10 +10,10 @@ public interface RemoteFileOperations {
 
     RemoteFile viewFile(RemoteFile f);
 
-    void removeFile(Integer id);
+    RemoteFile removeFile(Integer id);
 
-    void editFile(RemoteFile file);
+    RemoteFile editFile(RemoteFile file);
 
-    void createFile(RemoteFile file);
+    RemoteFile createFile(RemoteFile file);
 
 }

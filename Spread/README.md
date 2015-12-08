@@ -13,7 +13,13 @@ $ ./configure
 $ make
 $ make install
 ```
-Procure pelo arquivo example.spread.conf no diretório /docs, edite-o e mova para o diretório /daemon
+Procure pelo arquivo example.spread.conf no diretório /docs, procure por Spread_Segment e configure como a seguir:
+
+Spread_Segment  127.0.0.255:4803 {
+	localhost		127.0.0.1
+}
+
+Mova este arqquivo para o diretório raiz /spread
 
 ### Execução
 1. Pelo terminal, navegue até a pasta daemon
